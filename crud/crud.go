@@ -26,7 +26,7 @@ func (c *CRUD[T]) Create(ctx context.Context, a T) (T, error) {
 
 // Update modifies an existing record. Bun will use the model’s primary key.
 func (c *CRUD[T]) Update(ctx context.Context, a T) (T, error) {
-	_, err := c.db.NewUpdate().Model(&a).Exec(ctx)
+	_, err := c.db.NewUpdate().Model(&a).WherePK("id").Exec(ctx)
 	if err != nil {
 		return a, fmt.Errorf("update error: %w", err)
 	}
