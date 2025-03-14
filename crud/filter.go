@@ -62,3 +62,12 @@ func applyFilter(query *bun.SelectQuery, filter Filter) *bun.SelectQuery {
 	}
 	return query
 }
+
+// Filters
+func WhereEmailFilter(email string) Filter {
+	return Filter{WhereString: []KV[string]{{Key: "email", Value: email}}}
+}
+
+func WhereIdFilter(id int64) Filter {
+	return Filter{WhereInt64: []KV[int64]{{Key: "id", Value: id}}}
+}
