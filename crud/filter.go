@@ -71,3 +71,14 @@ func WhereEmailFilter(email string) Filter {
 func WhereIdFilter(id int64) Filter {
 	return Filter{WhereInt64: []KV[int64]{{Key: "id", Value: id}}}
 }
+
+func WhereSlugFilter(slug string) Filter {
+	return Filter{WhereString: []KV[string]{{Key: "slug", Value: slug}}}
+}
+
+func WhereSlugOrId(slug string, id int64) Filter {
+	return Filter{
+		WhereString: []KV[string]{{Key: "slug", Value: slug}},
+		WhereInt64:  []KV[int64]{{Key: "id", Value: id}},
+	}
+}
