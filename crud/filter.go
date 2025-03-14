@@ -6,11 +6,13 @@ import (
 	"github.com/uptrace/bun"
 )
 
+// KV is a key-value pair.
 type KV[V any] struct {
 	Key   string
 	Value V
 }
 
+// Filter is a set of conditions to apply to a query.
 type Filter struct {
 	OrInt64     []KV[int64]
 	OrInt       []KV[int]
