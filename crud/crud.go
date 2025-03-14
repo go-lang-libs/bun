@@ -16,21 +16,21 @@ type CRUD[T any] struct {
 }
 
 // Add inserts a new record using Bun's NewInsert.
-func (c *CRUD[T]) Create(ctx context.Context, a T) error {
-	_, err := c.db.NewInsert().Model(a).Exec(ctx)
+func (c *CRUD[T]) Create(ctx context.Context, a T) (T, error) {
+	_, err := c.db.NewInsert().Model(&a).Exec(ctx)
 	if err != nil {
-		return fmt.Errorf("insert error: %w", err)
+		return a, fmt.Errorf("insert error: %w", err)
 	}
-	return nil
+	return a, nil
 }
 
 // Update modifies an existing record. Bun will use the model’s primary key.
-func (c *CRUD[T]) Update(ctx context.Context, a T) error {
-	_, err := c.db.NewUpdate().Model(a).Exec(ctx)
+func (c *CRUD[T]) Update(ctx context.Context, a T) (T, error) {
+	_, err := c.db.NewUpdate().Model(&a).Exec(ctx)
 	if err != nil {
-		return fmt.Errorf("update error: %w", err)
+		return a, fmt.Errorf("update error: %w", err)
 	}
-	return nil
+	return a, nil
 }
 
 // Delete removes a record by its id.
