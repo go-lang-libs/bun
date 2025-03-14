@@ -7,45 +7,16 @@ import (
 	"github.com/uptrace/bun"
 )
 
-type KV[V any] struct {
-	Key   string
-	Value V
-}
-
-type Filter struct {
-	OrInt64     []KV[int64]
-	OrInt       []KV[int]
-	OrString    []KV[string]
-	AndInt      []KV[int]
-	AndInt64    []KV[int64]
-	AndString   []KV[string]
-	WhereInt    []KV[int]
-	WhereInt64  []KV[int64]
-	WhereString []KV[string]
-	Limit       int
-	Offset      int
-}
-
-type Crudable[T any] interface {
-	Add(ctx context.Context, a T) error
-	Update(ctx context.Context, a T) error
-	Delete(ctx context.Context, id int64) error
-	Get(ctx context.Context, filter Filter) (T, error)
-	List(ctx context.Context, filter Filter) ([]T, error)
-	Exists(ctx context.Context, filter Filter) bool
-}
-
 func New[T any](db *bun.DB) CRUD[T] {
 	return CRUD[T]{db: db}
 }
 
 type CRUD[T any] struct {
 	db *bun.DB
-	// Add necessary fields like DB connection, logger, etc.
 }
 
 // Add inserts a new record using Bun's NewInsert.
-func (c *CRUD[T]) Add(ctx context.Context, a T) error {
+func (c *CRUD[T]) Create(ctx context.Context, a T) error {
 	_, err := c.db.NewInsert().Model(a).Exec(ctx)
 	if err != nil {
 		return fmt.Errorf("insert error: %w", err)
@@ -119,42 +90,4 @@ func (c *CRUD[T]) GetBy(ctx context.Context, field string, value any) (T, error)
 		return result, fmt.Errorf("getBy error: %w", err)
 	}
 	return result, nil
-}
-
-// applyFilter applies the filter conditions to the query.
-func applyFilter(query *bun.SelectQuery, filter Filter) *bun.SelectQuery {
-	if filter.Limit > 0 {
-		query = query.Limit(filter.Limit)
-	}
-	if filter.Offset > 0 {
-		query = query.Offset(filter.Offset)
-	}
-	for _, kv := range filter.AndInt {
-		query = query.Where(fmt.Sprintf("%s = ?", kv.Key), kv.Value)
-	}
-	for _, kv := range filter.AndInt64 {
-		query = query.Where(fmt.Sprintf("%s = ?", kv.Key), kv.Value)
-	}
-	for _, kv := range filter.AndString {
-		query = query.Where(fmt.Sprintf("%s = ?", kv.Key), kv.Value)
-	}
-	for _, kv := range filter.OrInt {
-		query = query.WhereOr(fmt.Sprintf("%s = ?", kv.Key), kv.Value)
-	}
-	for _, kv := range filter.OrInt64 {
-		query = query.WhereOr(fmt.Sprintf("%s = ?", kv.Key), kv.Value)
-	}
-	for _, kv := range filter.OrString {
-		query = query.WhereOr(fmt.Sprintf("%s = ?", kv.Key), kv.Value)
-	}
-	for _, kv := range filter.WhereInt {
-		query = query.Where(fmt.Sprintf("%s = ?", kv.Key), kv.Value)
-	}
-	for _, kv := range filter.WhereInt64 {
-		query = query.Where(fmt.Sprintf("%s = ?", kv.Key), kv.Value)
-	}
-	for _, kv := range filter.WhereString {
-		query = query.Where(fmt.Sprintf("%s = ?", kv.Key), kv.Value)
-	}
-	return query
 }
